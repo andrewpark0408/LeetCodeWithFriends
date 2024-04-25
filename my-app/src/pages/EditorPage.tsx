@@ -66,15 +66,13 @@ function EditorPage() {
 
     return (
         <div className="container is-fluid">
-            <div className="columns" style={{ height: '15vh', marginTop: '20px' }}>
-                <div className="column is-full">
-                    <div className="box">
+            <div className="columns" style={{ height: '50vh', marginTop: '20px' }}>
+                <div className="column is-half">
+                    <div className="box" style={{ height: '50vh', overflowY: 'auto' }}>
                         <h2 className="title is-4">{question.title}</h2>
                         <p>{question.description}</p>
                     </div>
                 </div>
-            </div>
-            <div className="columns">
                 <div className="column is-half">
                     <div className="editor">
                         <Editor
@@ -86,19 +84,22 @@ function EditorPage() {
                         />
                     </div>
                 </div>
-                <div className="column is-half">
-                    <div className="box" style={{ overflowY: 'auto', height: '50vh' }}>
+            </div>
+            <div className="columns">
+                <div className="column is-full">
+                    <div className="box" style={{ overflowY: 'auto', height: '25vh' }}>
                         <button className="button is-info" onClick={runCode}>Run Tests</button>
                         <p>{expectedOutput}</p>
                         <p>{resultMessage}</p>
                         <p>{submissionStatus}</p>
                         <button className="button is-primary" onClick={handleSubmit} disabled={submissionStatus !== 'Accepted'}>Submit</button>
+                        <p>Console Output:</p>
+                        {consoleOutput.map((output, index) => <p key={index}>{output}</p>)}
                     </div>
                 </div>
             </div>
         </div>
     );
-
 }
 
 export default EditorPage;
