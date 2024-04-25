@@ -9,13 +9,17 @@ import EditorPage from './pages/EditorPage';
 
 const App: React.FC = () => {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [currentUser, setCurrentUser] = useState(null);  // Define currentUser state
+    const [currentUser, setCurrentUser] = useState<null | { [key: string]: any }>(null);
 
     useEffect(() => {
-        const userData = JSON.parse(localStorage.getItem('user'));
-        if (userData && userData.userId) {
-            setCurrentUser(userData);
-            setIsAuthenticated(true);
+        try {
+            const userData = JSON.parse(localStorage.getItem('user') || '{}'); // Added fallback to '{}' to ensure JSON.parse doesn't throw an error for null
+            if (userData && userData.userId) {
+                setCurrentUser(userData);
+                setIsAuthenticated(true);
+            }
+        } catch (error) {
+            console.error('Failed to parse user data from localStorage:', error);
         }
     }, []);
 
@@ -29,17 +33,16 @@ const App: React.FC = () => {
             localStorage.setItem('user', JSON.stringify(userData)); // Save user data to local storage
             setIsAuthenticated(true);
             setCurrentUser(userData);  // Set current user data
-        }} /> },
+        }} setIsAuthenticated={setIsAuthenticated} setCurrentUser={setCurrentUser} /> },
         { path: "/register", element: <RegisterPage /> },
         { path: "/editor", element: <EditorPage /> },
-        { path: "/groups", element: <GroupPage isAuthenticated={isAuthenticated} /> },
+        { path: "/groups", element: <GroupPage isAuthenticated={isAuthenticated} handleLogin={() => { console.log('handleLogin'); }} handleLogout={() => { console.log('handleLogout'); }} handleNavigate={() => { console.log('handleNavigate'); }} /> },
     ]);
 
     return (
-        <UserProvider value={{ currentUser, setCurrentUser }}>
+        <UserProvider user={currentUser} setUser={setCurrentUser}>
             {routes}
         </UserProvider>
     );
-}
-
+};
 export default App;

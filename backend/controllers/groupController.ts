@@ -8,17 +8,20 @@ interface RequestWithUser extends Request {
 }
 
 export const createGroup = async (req: RequestWithUser, res: Response) => {
+    console.log('req.body in createGroup', req.body);
     const { name, userId } = req.body;  // Retrieve userId from the body
-
+    console.log("Received userID:", userId);
     const code = uuidv4().slice(0, 8); // Generate a random 8-character code
     try {
         // Insert the new group and get its ID
         const newGroup = await pool.query(
-            'INSERT INTO groups (name, code) VALUES ($1, $2) RETURNING *',
-            [name, code]
+            'INSERT INTO groups (name, code, creator) VALUES ($1, $2, $3) RETURNING *', // Assuming 'creator' is a column in your 'groups' table
+            [name, code, userId]
         );
         const groupId = newGroup.rows[0].group_id;
 
+        console.log("User ID when creating group:", userId);
+        console.log("Group ID when creating group:", groupId);
         // Add the creator as an admin member of the group
         await pool.query(
             'INSERT INTO group_members (user_id, group_id, isAdmin) VALUES ($1, $2, true)',
@@ -104,20 +107,20 @@ export const leaveGroup = async (req: RequestWithUser, res: Response) => {
   }
 };
 
-export const addMemberToGroup = async (req: RequestWithUser, res: Response) => {
-    const { group_id, user_id, isAdmin } = req.body;
+// export const addMemberToGroup = async (req: RequestWithUser, res: Response) => {
+//     const { group_id, user_id, isAdmin } = req.body;
 
-    try {
-        const result = await pool.query(
-            'INSERT INTO GroupMembers (user_id, group_id, isAdmin) VALUES ($1, $2, $3) RETURNING *',
-            [user_id, group_id, isAdmin]
-        );
-        res.status(201).json(result.rows[0]);
-    } catch (error: any) {
-        console.error("Error adding member to group:", error);
-        res.status(500).json({ error: error.message });
-    }
-};
+//     try {
+//         const result = await pool.query(
+//             'INSERT INTO GroupMembers (user_id, group_id, isAdmin) VALUES ($1, $2, $3) RETURNING *',
+//             [user_id, group_id, isAdmin]
+//         );
+//         res.status(201).json(result.rows[0]);
+//     } catch (error: any) {
+//         console.error("Error adding member to group:", error);
+//         res.status(500).json({ error: error.message });
+//     }
+// };
 
 export const loginUser = async (req: RequestWithUser, res: Response) => {
     const { email, password } = req.body;

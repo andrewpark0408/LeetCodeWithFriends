@@ -1,6 +1,15 @@
-import React from 'react';
+import { ReactNode } from 'react';
 
-const Layout = ({ children, title, isAuthenticated, handleLogin, handleLogout, handleNavigate }) => {
+type LayoutProps = {
+    children: ReactNode;
+    title: string;
+    isAuthenticated: boolean;
+    handleLogin: () => void;
+    handleLogout: () => void;
+    handleNavigate: (path: string) => void;
+};
+
+const Layout = ({ children, title, isAuthenticated, handleLogin, handleLogout, handleNavigate }: LayoutProps) => {
     return (
         <div className="container">
             <h1>{title}</h1>

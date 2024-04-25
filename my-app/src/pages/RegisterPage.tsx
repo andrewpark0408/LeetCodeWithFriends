@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
@@ -9,7 +9,7 @@ function RegisterPage() {
     const [error, setError] = useState('');
     const navigate = useNavigate();
 
-    const handleRegister = async (event) => {
+    const handleRegister = async (event: any) => {
         event.preventDefault();
         setError(''); // Clear previous errors
         try {

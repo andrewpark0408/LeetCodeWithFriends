@@ -1,30 +1,35 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
-function LoginPage({ onLogin, setIsAuthenticated, setCurrentUser }: { onLogin: () => void, setIsAuthenticated: Function, setCurrentUser: Function }) {
+
+function LoginPage({ onLogin, setIsAuthenticated, setCurrentUser }: { onLogin: (userData: any) => void, setIsAuthenticated: Function, setCurrentUser: Function }) {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [rememberMe, setRememberMe] = useState(false);
+
     const navigate = useNavigate();
 
-    const handleLogin = async () => {
+    const handleLogin = async (event: any) => {
+        event.preventDefault();
         try {
             const response = await axios.post('http://localhost:3001/api/users/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password })
+                email,
+                password
+            }, {
+                headers: { 'Content-Type': 'application/json' }
             });
 
-            if (!response.ok) {
+            if (response.status !== 200) {
                 throw new Error('Login failed');
             }
 
-            const userData = await response.json();
+            const userData = response.data;
             console.log('user data:', userData);
             localStorage.setItem('user', JSON.stringify(userData));
             setIsAuthenticated(true); // Set isAuthenticated state to true
             setCurrentUser(userData); // Set current user data
+            onLogin(userData); // Call onLogin with userData
             console.log('Navigating to home/dashboard');
             navigate('/'); // Navigate to home or dashboard
         } catch (error) {
