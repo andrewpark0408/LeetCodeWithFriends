@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Layout from './Layout';
 import { useUser } from '../contexts/UserContext'; // Import UserContext and UserContextType
 import 'bulma/css/bulma.css';
@@ -29,6 +29,32 @@ function GroupPage({ isAuthenticated, handleLogin, handleLogout, handleNavigate 
     console.log("Current User:", user)
     console.log("Current User ID:", user?.userId); // Check if user is defined
 
+     // Fetch the user's groups when the page loads
+     useEffect(() => {
+        const fetchGroups = async () => {
+            if (!user) return;
+            try {
+                console.log("Current User ID:", user.userId)
+                const response = await fetch(`http://localhost:3001/api/users/userGroups/${user.userId}`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+            });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch groups');
+                }
+
+                const fetchedGroups = await response.json();
+                setGroups(fetchedGroups);
+            } catch (error) {
+                console.error('Failed to fetch groups:', error);
+            }
+        };
+
+        fetchGroups();
+    }, [user]);
 
     const handleCreateGroup = async () => {
         const name = prompt('Enter group name');
@@ -52,7 +78,7 @@ function GroupPage({ isAuthenticated, handleLogin, handleLogout, handleNavigate 
             }
 
             // Add the new group to the groups state
-            setGroups(prevGroups => [...prevGroups, {...responseData, creator: userId.toString()}]);
+            setGroups(prevGroups => [...prevGroups, { ...responseData, id: responseData.group_id, creator: userId.toString() }]);
 
             if (user) {
                 console.log("Current User ID:", user.userId);
@@ -94,12 +120,13 @@ function GroupPage({ isAuthenticated, handleLogin, handleLogout, handleNavigate 
     const handleLeaveGroup = async (group: Group) => {
         try {
             // Make a DELETE request to the /leave/:groupId route
-            const response = await fetch(`http://localhost:3001/api/users/leavegroup/${group.id}`, {
+            const response = await fetch(`http://localhost:3001/api/groups/leavegroup/${group.id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json',
-                    // Include your authentication token here
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`,
                 },
+                credentials: 'include',
             });
 
             if (!response.ok) {

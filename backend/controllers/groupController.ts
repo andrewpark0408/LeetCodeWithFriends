@@ -87,7 +87,7 @@ export const leaveGroup = async (req: RequestWithUser, res: Response) => {
   try {
       // Check if user is a member of the group
       const memberCheck = await pool.query(
-          'SELECT * FROM GroupMembers WHERE user_id = $1 AND group_id = $2',
+          'SELECT * FROM group_members WHERE user_id = $1 AND group_id = $2',
           [userId, groupId]
       );
 
@@ -97,7 +97,7 @@ export const leaveGroup = async (req: RequestWithUser, res: Response) => {
 
       // Remove user from the group
       await pool.query(
-          'DELETE FROM GroupMembers WHERE user_id = $1 AND group_id = $2',
+          'DELETE FROM group_members WHERE user_id = $1 AND group_id = $2',
           [userId, groupId]
       );
 

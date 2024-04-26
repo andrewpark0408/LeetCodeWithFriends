@@ -43,12 +43,18 @@ app.use(express.json());
 app.use(cors({
     origin: 'http://localhost:5173',
     methods: ['GET', 'POST', 'OPTIONS', 'DELETE'],
-    allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept'],
+    allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'],
+    credentials: true,
 }));
 
 // Use routers for different API paths
 app.use('/api/groups', gRouter);
 app.use('/api/users', router);
+
+app.use((req, res, next) => {
+    console.log(`${req.method} ${req.path}`);
+    next();
+});
 
 const PORT = process.env.PORT || 3001;
 
@@ -66,10 +72,6 @@ app.get('/testdb', async (req, res) => {
     }
 });
 
-// Hello world endpoint
-app.get('/hello', (req, res) => {
-    res.send('Hello World!');
-});
 
 // Start the server
 app.listen(PORT, () => {

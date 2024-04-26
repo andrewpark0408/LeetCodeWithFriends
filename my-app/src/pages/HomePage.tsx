@@ -1,9 +1,11 @@
 import React from 'react';
 import Layout from './Layout';
 import { useNavigate } from 'react-router-dom';
+import { useUser } from '../contexts/UserContext';
 
 const HomePage: React.FC<{ isAuthenticated: boolean; onLogout: () => void }> = ({ isAuthenticated, onLogout }) => {
     const navigate = useNavigate();
+    const { user } = useUser();
 
     const handleNavigate = (path: string) => {
         navigate(path);
@@ -24,6 +26,7 @@ const HomePage: React.FC<{ isAuthenticated: boolean; onLogout: () => void }> = (
             handleLogin={handleLogin}
             handleLogout={handleLogout}
             handleNavigate={handleNavigate}
+            user={user}
         >
             <section className="hero is-primary is-bold">
             <div className="hero-body">
